@@ -3,24 +3,27 @@ import SQLiteWorker from './worker.js?worker'
 const wrapWorker = worker => {
   const idMap = new Map()
   let counter = 0
-  const nextId = () => counter++
+  const nextId = () => ++counter
 
   const listener = e => {
     const { data } = e
-    console.log(data)
     const { type, id } = data
+
+    if (!id) throw new Error('Message has no id')
+    const resolveRejectObj = idMap.get(id)
+    if (!resolveRejectObj) throw new Error('Message has unknown id: ' + id)
+    idMap.delete(id)
+
     switch (type) {
       case 'result': {
         const { result } = data
-        console.log('Error from worker', result)
-        const { resolve } = idMap.get(id)
+        const { resolve } = resolveRejectObj
         resolve(result)
         break
       }
       case 'error': {
         const { errorMessage } = data
-        console.log('Error from worker', errorMessage)
-        const { reject } = idMap.get(id)
+        const { reject } = resolveRejectObj
         reject(new Error(errorMessage))
         break
       }
@@ -30,19 +33,17 @@ const wrapWorker = worker => {
     }
   }
   worker.addEventListener('message', listener)
+  const asyncCommand = params => {
+    const id = nextId()
+    return new Promise((resolve, reject) => {
+      idMap.set(id, { resolve, reject })
+      worker.postMessage({ ...params, id })
+    })
+  }
   return {
     openSimulateError: () =>
-      new Promise((resolve, reject) => {
-        const id = nextId()
-        idMap.set(id, { resolve, reject })
-        worker.postMessage({ type: 'open', id, simulateError: true })
-      }),
-    getConfig: () =>
-      new Promise((resolve, reject) => {
-        const id = nextId()
-        idMap.set(id, { resolve, reject })
-        worker.postMessage({ type: 'configGet', id })
-      }),
+      asyncCommand({ type: 'open', simulateError: true }),
+    getConfig: () => asyncCommand({ type: 'configGet' }),
   }
 }
 

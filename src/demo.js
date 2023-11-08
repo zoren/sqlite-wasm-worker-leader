@@ -1,7 +1,11 @@
 import { initWorker } from './leader.js'
 
 const worker1 = await initWorker()
-// const worker2 = await initWorker();
 
-worker1.openSimulateError()
+try {
+  await worker1.openSimulateError()
+  console.error('openSimulateError did not throw as expected')
+} catch (error) {
+  console.log('openSimulateError threw as expected', error.message)
+}
 console.log('config', await worker1.getConfig())
