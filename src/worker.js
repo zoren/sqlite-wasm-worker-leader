@@ -77,8 +77,11 @@ const listener = event => {
     resultObj.result = runCommand(data)
     resultObj.type = 'result'
   } catch (error) {
-    resultObj.errorMessage = error.message
+    const { message, name, stack } = error
+    resultObj.errorMessage = message
     resultObj.type = 'error'
+    resultObj.errorClass = name
+    resultObj.stack = typeof stack === 'string' ? stack.split(/\n\s*/) : stack
   }
   postMessage(resultObj)
 }

@@ -6,7 +6,7 @@ try {
   await worker1.open({ simulateError: true })
   console.error('open did not throw as expected')
 } catch (error) {
-  console.log('open threw as expected', error.message)
+  console.log('open threw as expected', error, error.cause)
 }
 console.log('config', await worker1.getConfig())
 const dbHandle = await worker1.open({ filename: ':memory:' })

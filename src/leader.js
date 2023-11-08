@@ -24,7 +24,7 @@ const wrapWorker = worker => {
       case 'error': {
         const { errorMessage } = data
         const { reject } = resolveRejectObj
-        reject(new Error(errorMessage))
+        reject(new Error(errorMessage, { cause: data }))
         break
       }
       default: {
