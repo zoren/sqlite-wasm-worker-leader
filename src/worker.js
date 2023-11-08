@@ -38,8 +38,6 @@ const runCommand = d => {
       const { filename } = d
 
       if (typeof filename !== 'string') throw new Error('filename is missing')
-      if (filename.length !== 0 && !filename.startsWith(':'))
-        throw new Error('filename is not special')
       const db = new oo1.DB(d)
       const dbId = getDbId(db)
       dbs.set(dbId, db)
