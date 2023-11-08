@@ -1,7 +1,7 @@
 import SQLiteWorker from './worker.js?worker'
 
 const wrapWorker = worker => {
-  const idMap = new Map()
+  const asyncMap = new Map()
   let counter = 0
   const nextId = () => ++counter
 
@@ -10,9 +10,9 @@ const wrapWorker = worker => {
     const { type, id } = data
 
     if (!id) throw new Error('Message has no id')
-    const resolveRejectObj = idMap.get(id)
+    const resolveRejectObj = asyncMap.get(id)
     if (!resolveRejectObj) throw new Error('Message has unknown id: ' + id)
-    idMap.delete(id)
+    asyncMap.delete(id)
 
     switch (type) {
       case 'result': {
@@ -36,13 +36,12 @@ const wrapWorker = worker => {
   const asyncCommand = params => {
     const id = nextId()
     return new Promise((resolve, reject) => {
-      idMap.set(id, { resolve, reject })
+      asyncMap.set(id, { resolve, reject })
       worker.postMessage({ ...params, id })
     })
   }
   return {
-    openSimulateError: () =>
-      asyncCommand({ type: 'open', simulateError: true }),
+    open: paramObj => asyncCommand({ type: 'open', ...paramObj }),
     getConfig: () => asyncCommand({ type: 'configGet' }),
   }
 }
