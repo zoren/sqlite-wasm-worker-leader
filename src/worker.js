@@ -41,7 +41,7 @@ const runCommand = d => {
     }
     case 'close': {
       const { dbId, unlink } = d
-      if (typeof unlink !== 'undefined') throw new Error('unlink not supported')
+      if (typeof unlink !== 'undefined') throw new Error('unlink not supported, db not closed')
       const db = dbs.get(dbId)
       if (!db) throw new Error(`close: unknown dbId: ${dbId}`)
       const filename = db.filename
@@ -49,7 +49,15 @@ const runCommand = d => {
       dbs.delete(dbId)
       return { filename }
     }
-    case 'configGet':
+    case 'exec': {
+      const { dbId, sql, rowMode } = d
+      if (typeof sql !== 'string') throw new Error('sql is missing')
+      if (rowMode === 'stmt') throw new Error('rowMode stmt not supported in worker')
+      const db = dbs.get(dbId)
+      if (!db) throw new Error(`exec: unknown dbId: ${dbId}`)
+      return db.exec(d)
+    }
+    case 'getConfig':
       return {
         version,
         vfsList: capi.sqlite3_js_vfs_list(),
