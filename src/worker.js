@@ -1,7 +1,7 @@
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm'
 
 const sqlite3 = await sqlite3InitModule()
-const { version } = sqlite3
+const { version, config, opfs, capi } = sqlite3
 
 const runCommand = d => {
   const { type } = d
@@ -11,15 +11,13 @@ const runCommand = d => {
         throw new Error('Throwing because of simulateError flag.')
       throw new Error('Not implemented')
     }
-    case 'configGet': {
-      const result = {
-        // bigIntEnabled: sqlite3.config,
+    case 'configGet':
+      return {
         version,
-        vfsList: sqlite3.capi.sqlite3_js_vfs_list(),
-        opfsEnabled: !!sqlite3.opfs,
+        vfsList: capi.sqlite3_js_vfs_list(),
+        opfsEnabled: !!opfs,
+        bigIntEnabled: config.bigIntEnabled,
       }
-      return result
-    }
     default:
       throw new Error(`runCommand: unknown type: ${type}`)
   }
