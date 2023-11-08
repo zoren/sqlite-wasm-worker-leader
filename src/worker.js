@@ -1,5 +1,16 @@
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm'
 
+const __selectFirstRow = (db, sql, bind, ...getArgs) => {
+  const stmt = db.prepare(sql)
+  try {
+    const rc = stmt.bind(bind).step() ? stmt.get(...getArgs) : undefined
+    stmt.reset()
+    return rc
+  } finally {
+    stmt.finalize()
+  }
+}
+
 const sqlite3 = await sqlite3InitModule()
 const { version, config, opfs, capi, oo1 } = sqlite3
 
@@ -58,6 +69,12 @@ const runCommand = d => {
       const db = dbs.get(dbId)
       if (!db) throw new Error(`exec: unknown dbId: ${dbId}`)
       return db.exec(d)
+    }
+    case 'selectValue': {
+      const { dbId, sql, bind, asType } = d
+      const db = dbs.get(dbId)
+      if (!db) throw new Error(`selectValue: unknown dbId: ${dbId}`)
+      return __selectFirstRow(db, sql, bind, 0, asType)
     }
     case 'getConfig':
       return {

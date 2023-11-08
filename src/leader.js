@@ -44,6 +44,7 @@ const wrapWorker = worker => {
     open: paramObj => asyncCommand({ type: 'open', ...paramObj }),
     close: dbId => asyncCommand({ type: 'close', dbId }),
     exec: paramObj => asyncCommand({ type: 'exec', ...paramObj }),
+    selectValue: paramObj => asyncCommand({ type: 'selectValue', ...paramObj }),
     getConfig: () => asyncCommand({ type: 'getConfig' }),
   }
 }
