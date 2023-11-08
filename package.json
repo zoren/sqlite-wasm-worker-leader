@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@sqlite.org/sqlite-wasm": "^3.44.0-build1"
+  },
+  "devDependencies": {
+    "vite": "^4.5.0"
+  }
+}
