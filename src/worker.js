@@ -26,16 +26,15 @@ const runCommand = d => {
 const listener = event => {
   const { data } = event
   const { type, id } = data
+  const resultObj = { inType: type, id }
   try {
-    postMessage({ type: 'result', inType: type, id, result: runCommand(data) })
+    resultObj.result = runCommand(data)
+    resultObj.type = 'result'
   } catch (error) {
-    postMessage({
-      type: 'error',
-      inType: type,
-      id,
-      errorMessage: error.message,
-    })
+    resultObj.errorMessage = error.message
+    resultObj.type = 'error'
   }
+  postMessage(resultObj)
 }
 
 addEventListener('message', listener)
