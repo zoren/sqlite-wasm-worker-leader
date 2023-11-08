@@ -39,6 +39,16 @@ const runCommand = d => {
         vfs: db.dbVfsName(),
       }
     }
+    case 'close': {
+      const { dbId, unlink } = d
+      if (typeof unlink !== 'undefined') throw new Error('unlink not supported')
+      const db = dbs.get(dbId)
+      if (!db) throw new Error(`close: unknown dbId: ${dbId}`)
+      const filename = db.filename
+      db.close()
+      dbs.delete(dbId)
+      return { filename }
+    }
     case 'configGet':
       return {
         version,

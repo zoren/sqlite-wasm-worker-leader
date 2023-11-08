@@ -11,3 +11,5 @@ try {
 console.log('config', await worker1.getConfig())
 const dbHandle = await worker1.open({ filename: ':memory:' })
 console.log('dbHandle', dbHandle)
+const { dbId } = dbHandle
+console.log(await worker1.close(dbId))
