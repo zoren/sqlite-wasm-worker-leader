@@ -31,6 +31,14 @@ const dbs = new Map()
 const runCommand = d => {
   const { type } = d
   switch (type) {
+    case 'getConfig':
+      return {
+        version,
+        vfsList: capi.sqlite3_js_vfs_list(),
+        opfsEnabled: !!opfs,
+        bigIntEnabled: config.bigIntEnabled,
+      }
+    // db specific
     case 'open': {
       const { filename } = d
       if (typeof filename !== 'string') throw new Error('filename is missing')
@@ -67,13 +75,6 @@ const runCommand = d => {
       if (!db) throw new Error(`selectValue: unknown dbId: ${dbId}`)
       return __selectFirstRow(db, sql, bind, 0, asType)
     }
-    case 'getConfig':
-      return {
-        version,
-        vfsList: capi.sqlite3_js_vfs_list(),
-        opfsEnabled: !!opfs,
-        bigIntEnabled: config.bigIntEnabled,
-      }
     default:
       throw new Error(`runCommand: unknown type: ${type}`)
   }

@@ -40,12 +40,26 @@ const wrapWorker = worker => {
       worker.postMessage({ ...params, id })
     })
   }
+  const wrapDB = openInfoParam => {
+    const openInfo = Object.freeze(openInfoParam)
+    const { dbId } = openInfo
+    const asyncCommandDB = (type, paramObj) =>
+      asyncCommand({ type, dbId, ...paramObj })
+    return Object.freeze({
+      getInfo: () => openInfo,
+      close: () => asyncCommandDB('close', null),
+      exec: paramObj => asyncCommandDB('exec', { ...paramObj }),
+      selectValue: paramObj => asyncCommandDB('selectValue', { ...paramObj }),
+    })
+  }
   return {
-    open: paramObj => asyncCommand({ type: 'open', ...paramObj }),
+    // general, does not require dbId
+    getConfig: () => asyncCommand({ type: 'getConfig' }),
+
+    open: async paramObj => wrapDB(await asyncCommand({ type: 'open', ...paramObj })),
     close: dbId => asyncCommand({ type: 'close', dbId }),
     exec: paramObj => asyncCommand({ type: 'exec', ...paramObj }),
     selectValue: paramObj => asyncCommand({ type: 'selectValue', ...paramObj }),
-    getConfig: () => asyncCommand({ type: 'getConfig' }),
   }
 }
 
