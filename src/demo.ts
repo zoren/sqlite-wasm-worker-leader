@@ -3,7 +3,7 @@ import { initWorker } from './leader.js'
 const worker1 = await initWorker()
 
 try {
-  await worker1.open({ simulateError: true })
+  await worker1.open({})
   console.error('open did not throw as expected')
 } catch (error) {
   console.log('open threw as expected', error, error.cause)
