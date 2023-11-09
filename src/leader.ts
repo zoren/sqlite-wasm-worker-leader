@@ -22,7 +22,29 @@ interface Config {
   bigIntEnabled: boolean
 }
 
-const wrapWorker = (worker: Worker, versionParam: Version) => {
+interface OpenInfo {
+  filename: string
+  persistent: boolean
+  dbId: string
+  vfs: string
+}
+
+interface DB {
+  openInfo: OpenInfo
+  close: () => Promise<void>
+  exec: (params: { sql: string, rowMode?: 'array' | 'object' }) => Promise<null>
+  execArray: (params: { sql: string }) => Promise<any[]>
+  execObject: (params: { sql: string }) => Promise<any[]>
+  selectValue: (params: { sql: string }) => Promise<any>
+}
+
+interface SQLiteWorker {
+  version: Version
+  getConfig: () => Promise<Config>
+  open: (params: { filename?: string, vfs?: string }) => Promise<DB>
+}
+
+const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
   const version = Object.freeze(versionParam)
   const asyncMap = new Map()
   let counter = 0
@@ -63,15 +85,19 @@ const wrapWorker = (worker: Worker, versionParam: Version) => {
       worker.postMessage({ ...params, id })
     })
   }
-  const wrapDB = (openInfoParam) => {
+  const wrapDB = (openInfoParam: OpenInfo): Readonly<DB> => {
     const openInfo = Object.freeze(openInfoParam)
     const { dbId } = openInfo
-    const asyncCommandDB = (type, paramObj) =>
-      asyncCommand({ type, dbId, ...paramObj })
+    const asyncCommandDB = <R> (type, paramObj) =>
+      asyncCommand<R>({ type, dbId, ...paramObj })
     return Object.freeze({
       openInfo,
-      close: () => asyncCommandDB('close', null),
-      exec: paramObj => asyncCommandDB('exec', { ...paramObj }),
+      close: () => asyncCommandDB<void>('close', null),
+      exec: async paramObj => {
+        await asyncCommandDB('exec', { ...paramObj })
+        return null},
+      execArray: paramObj => asyncCommandDB<any[][]>('exec', { rowMode: 'array', ...paramObj }),
+      execObject: paramObj => asyncCommandDB<any[]>('exec', { rowMode: 'object', ...paramObj }),
       selectValue: paramObj => asyncCommandDB('selectValue', { ...paramObj }),
     })
   }
@@ -79,11 +105,11 @@ const wrapWorker = (worker: Worker, versionParam: Version) => {
     version,
     getConfig: () => asyncCommand<Config>({ type: 'getConfig' }),
 
-    open: async paramObj => wrapDB(await asyncCommand({ type: 'open', ...paramObj })),
+    open: async paramObj => wrapDB(await asyncCommand<OpenInfo>({ type: 'open', ...paramObj })),
   })
 }
 
-export const initWorker = () =>
+export const initWorker = (): Promise<SQLiteWorker> =>
   new Promise((resolve, reject) => {
     const worker: Worker = new SQLiteWorker()
 
