@@ -1,6 +1,6 @@
-import { initWorker } from './leader.js'
+import { initWorker } from './src/leader.js'
 
-const worker1 = await initWorker('worker.js')
+const worker1 = await initWorker('src/worker.js')
 
 try {
   await worker1.open({})

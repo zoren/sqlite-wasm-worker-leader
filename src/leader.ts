@@ -1,4 +1,4 @@
-import { FlexibleString, SqlValue } from '@sqlite.org/sqlite-wasm'
+import type { FlexibleString, SqlValue } from '@sqlite.org/sqlite-wasm'
 
 class SQLiteError extends Error {
   eventData: any
