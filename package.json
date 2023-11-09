@@ -1,6 +1,28 @@
 {
+  "name": "sqlite-wasm-worker-leader",
+  "description": "",
+  "version": "1.0.0",
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "main": "lib/leader.js",
+  "types": "lib/leader.d.ts",
+  "exports": {
+    ".": {
+      "worker": "./worker.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/"
+  ],
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "prepublish": "tsc && cp src/worker.js lib/worker.js",
+    "clean": "rm -rf lib"
   },
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "^3.44.0-build1"
