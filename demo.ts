@@ -15,8 +15,9 @@ console.log('exec', await db.execArray({ sql: `create table if not exists t1(a, 
 console.log('exec', await db.execArray({ sql: `delete from t1` }))
 console.log('exec', await db.execArray({ sql: `insert into t1 values(1, 'hello'), (2, 'world')` }))
 console.log('exec', await db.execObject({ sql: "select a, b from t1" }))
-console.log('selectValue', await db.selectValue({ sql: "select a from t1 limit 1" }))
-console.log('selectValue', await db.selectValue({ sql: "select b from t1 limit 1" }))
+console.log('selectValue', await db.selectValue("select a from t1 limit 1"))
+console.log('selectValue', await db.selectValue("select b from t1 limit 1"))
+console.log('selectValue', await db.selectValue("select $p from t1 limit 1", { $p: 'parameter' }))
 console.log('selectValues', await db.selectValues("select b from t1"))
 
 console.log('close', await db.close())

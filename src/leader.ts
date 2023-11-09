@@ -35,7 +35,7 @@ interface DB {
   exec: (params: { sql: FlexibleString, rowMode?: 'array' | 'object' }) => Promise<null>
   execArray: (params: { sql: FlexibleString }) => Promise<any[]>
   execObject: (params: { sql: FlexibleString }) => Promise<any[]>
-  selectValue: (params: { sql: FlexibleString }) => Promise<SqlValue | undefined>
+  selectValue: (sql: FlexibleString, bind?: BindingSpec) => Promise<SqlValue | undefined>
   selectValues: (sql: FlexibleString, bind?: BindingSpec, asType?: SQLiteDataType) => Promise<SqlValue[]>
 }
 
@@ -99,7 +99,7 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
         return null},
       execArray: paramObj => asyncCommandDB<any[][]>('exec', { rowMode: 'array', ...paramObj }),
       execObject: paramObj => asyncCommandDB<any[]>('exec', { rowMode: 'object', ...paramObj }),
-      selectValue: paramObj => asyncCommandDB<SqlValue>('selectValue', { ...paramObj }),
+      selectValue: (sql, bind) => asyncCommandDB<SqlValue>('selectValue', { sql, bind }),
       selectValues: (sql, bind, asType) => asyncCommandDB<SqlValue[]>('selectValues', { sql, bind, asType }),
     })
   }
