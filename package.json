@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "vite",
     "prepublish": "tsc && cp src/worker.js lib/worker.js",
-    "clean": "rm -rf lib"
+    "clean": "rm -rf lib/ && rm -rf sqlite-wasm-worker-leader-*.tgz"
   },
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "^3.44.0-build1"
