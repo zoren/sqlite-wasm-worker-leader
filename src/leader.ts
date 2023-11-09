@@ -109,9 +109,9 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
   })
 }
 
-export const initWorker = (workerScriptUrl: string | URL): Promise<SQLiteWorker> =>
+export const initWorker = (workerScriptUrl: string | URL | undefined): Promise<SQLiteWorker> =>
   new Promise((resolve, reject) => {
-    const worker: Worker = new Worker(workerScriptUrl, { type: 'module' })
+    const worker: Worker = new Worker(workerScriptUrl === undefined ? 'worker.js' : workerScriptUrl, { type: 'module' })
 
     const initListener = ({ data }) => {
       if (data.type !== 'ready')
