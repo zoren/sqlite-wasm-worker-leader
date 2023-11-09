@@ -1,4 +1,4 @@
-import SQLiteWorker from './worker.js?worker'
+import { FlexibleString, SqlValue } from '@sqlite.org/sqlite-wasm'
 
 class SQLiteError extends Error {
   eventData: any
@@ -32,16 +32,16 @@ interface OpenInfo {
 interface DB {
   openInfo: OpenInfo
   close: () => Promise<void>
-  exec: (params: { sql: string, rowMode?: 'array' | 'object' }) => Promise<null>
-  execArray: (params: { sql: string }) => Promise<any[]>
-  execObject: (params: { sql: string }) => Promise<any[]>
-  selectValue: (params: { sql: string }) => Promise<any>
+  exec: (params: { sql: FlexibleString, rowMode?: 'array' | 'object' }) => Promise<null>
+  execArray: (params: { sql: FlexibleString }) => Promise<any[]>
+  execObject: (params: { sql: FlexibleString }) => Promise<any[]>
+  selectValue: (params: { sql: FlexibleString }) => Promise<SqlValue | undefined>
 }
 
 interface SQLiteWorker {
   version: Version
   getConfig: () => Promise<Config>
-  open: (params: { filename?: string, vfs?: string }) => Promise<DB>
+  open: (options: { filename?: string; flags?: string; vfs?: string }) => Promise<DB>
 }
 
 const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
@@ -98,7 +98,7 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
         return null},
       execArray: paramObj => asyncCommandDB<any[][]>('exec', { rowMode: 'array', ...paramObj }),
       execObject: paramObj => asyncCommandDB<any[]>('exec', { rowMode: 'object', ...paramObj }),
-      selectValue: paramObj => asyncCommandDB('selectValue', { ...paramObj }),
+      selectValue: paramObj => asyncCommandDB<SqlValue>('selectValue', { ...paramObj }),
     })
   }
   return Object.freeze({
@@ -109,9 +109,9 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
   })
 }
 
-export const initWorker = (): Promise<SQLiteWorker> =>
+export const initWorker = (workerScriptUrl: string | URL): Promise<SQLiteWorker> =>
   new Promise((resolve, reject) => {
-    const worker: Worker = new SQLiteWorker()
+    const worker: Worker = new Worker(workerScriptUrl, { type: 'module' })
 
     const initListener = ({ data }) => {
       if (data.type !== 'ready')
