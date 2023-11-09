@@ -11,11 +11,8 @@
   "main": "lib/leader.js",
   "types": "lib/leader.d.ts",
   "exports": {
-    ".": {
-      "node": "./lib/node/nodeLeader.js",
-      "browser": "./lib/browser/browserLeader.js"
-    },
-    "./package.json": "./package.json"
+    "./nodeLeader.js": "./lib/node/nodeLeader.js",
+    "./browserLeader.js": "./lib/browser/browserLeader.js"
   },
   "files": [
     "lib/"
