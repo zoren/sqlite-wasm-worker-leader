@@ -1,7 +1,7 @@
 {
   "name": "sqlite-wasm-worker-leader",
   "description": "",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "directories": {
     "lib": "lib"
   },
