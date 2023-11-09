@@ -32,11 +32,7 @@ const runCommand = d => {
   const { type } = d
   switch (type) {
     case 'open': {
-      const { simulateError } = d
-      if (simulateError)
-        throw new Error('Throwing because of simulateError flag.')
       const { filename } = d
-
       if (typeof filename !== 'string') throw new Error('filename is missing')
       const db = new oo1.DB(d)
       const dbId = getDbId(db)
@@ -49,15 +45,12 @@ const runCommand = d => {
       }
     }
     case 'close': {
-      const { dbId, unlink } = d
-      if (typeof unlink !== 'undefined')
-        throw new Error('unlink not supported, db not closed')
+      const { dbId } = d
       const db = dbs.get(dbId)
       if (!db) throw new Error(`close: unknown dbId: ${dbId}`)
-      const filename = db.filename
       db.close()
       dbs.delete(dbId)
-      return { filename }
+      return null
     }
     case 'exec': {
       const { dbId, sql, rowMode } = d
