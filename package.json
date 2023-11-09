@@ -10,12 +10,6 @@
   "license": "ISC",
   "main": "lib/leader.js",
   "types": "lib/leader.d.ts",
-  "exports": {
-    ".": {
-      "worker": "./worker.js"
-    },
-    "./package.json": "./package.json"
-  },
   "files": [
     "lib/"
   ],
