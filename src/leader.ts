@@ -1,4 +1,4 @@
-import type { FlexibleString, SqlValue } from '@sqlite.org/sqlite-wasm'
+import type { FlexibleString, SqlValue, BindingSpec, SQLiteDataType } from '@sqlite.org/sqlite-wasm'
 
 class SQLiteError extends Error {
   eventData: any
@@ -36,6 +36,7 @@ interface DB {
   execArray: (params: { sql: FlexibleString }) => Promise<any[]>
   execObject: (params: { sql: FlexibleString }) => Promise<any[]>
   selectValue: (params: { sql: FlexibleString }) => Promise<SqlValue | undefined>
+  selectValues: (sql: FlexibleString, bind?: BindingSpec, asType?: SQLiteDataType) => Promise<SqlValue[]>
 }
 
 interface SQLiteWorker {
@@ -99,6 +100,7 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
       execArray: paramObj => asyncCommandDB<any[][]>('exec', { rowMode: 'array', ...paramObj }),
       execObject: paramObj => asyncCommandDB<any[]>('exec', { rowMode: 'object', ...paramObj }),
       selectValue: paramObj => asyncCommandDB<SqlValue>('selectValue', { ...paramObj }),
+      selectValues: (sql, bind, asType) => asyncCommandDB<SqlValue[]>('selectValues', { sql, bind, asType }),
     })
   }
   return Object.freeze({

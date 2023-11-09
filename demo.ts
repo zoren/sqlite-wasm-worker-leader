@@ -17,4 +17,6 @@ console.log('exec', await db.execArray({ sql: `insert into t1 values(1, 'hello')
 console.log('exec', await db.execObject({ sql: "select a, b from t1" }))
 console.log('selectValue', await db.selectValue({ sql: "select a from t1 limit 1" }))
 console.log('selectValue', await db.selectValue({ sql: "select b from t1 limit 1" }))
-console.log(await db.close())
+console.log('selectValues', await db.selectValues("select b from t1"))
+
+console.log('close', await db.close())

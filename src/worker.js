@@ -75,6 +75,20 @@ const runCommand = d => {
       if (!db) throw new Error(`selectValue: unknown dbId: ${dbId}`)
       return __selectFirstRow(db, sql, bind, 0, asType)
     }
+    case 'selectValues': {
+			const { dbId, sql, bind, asType } = d
+			const db = dbs.get(dbId)
+			const stmt = db.prepare(sql),
+				rc = []
+			try {
+				stmt.bind(bind)
+				while (stmt.step()) rc.push(stmt.get(0, asType))
+				stmt.reset()
+			} finally {
+				stmt.finalize()
+			}
+			return rc
+		}
     default:
       throw new Error(`runCommand: unknown type: ${type}`)
   }
