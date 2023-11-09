@@ -13,15 +13,17 @@
   "files": [
     "lib/"
   ],
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "prepublish": "tsc && cp src/worker.js lib/worker.js",
+    "prepublish": "tsc && cp src/worker.js lib/ && cp src/node/nodeWorker.js lib/node/ && cp src/browser/browserWorker.js lib/browser/",
     "clean": "rm -rf lib/ && rm -rf sqlite-wasm-worker-leader-*.tgz"
   },
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "^3.44.0-build1"
   },
   "devDependencies": {
+    "@types/node": "^20.9.0",
     "vite": "^4.5.0"
   },
   "prettier": {

@@ -13,6 +13,6 @@
     "skipLibCheck": true,
     
   },
-  "include": ["src/", "demo.ts"],
+  "include": ["src/"],
   "exclude": ["node_modules", "lib", "*.ts"]
 }

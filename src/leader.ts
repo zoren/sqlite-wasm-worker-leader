@@ -8,28 +8,28 @@ class SQLiteError extends Error {
   }
 }
 
-interface Version {
+export interface Version {
   libVersion: string
   libVersionNumber: number
   sourceId: string
   downloadVersion: number
 }
 
-interface Config {
+export interface Config {
   version: Version
   vfsList: string[]
   opfsEnabled: boolean
   bigIntEnabled: boolean
 }
 
-interface OpenInfo {
+export interface OpenInfo {
   filename: string
   persistent: boolean
   dbId: string
   vfs: string
 }
 
-interface DB {
+export interface DB {
   openInfo: OpenInfo
   close: () => Promise<void>
   exec: (params: { sql: FlexibleString, rowMode?: 'array' | 'object' }) => Promise<null>
@@ -39,20 +39,19 @@ interface DB {
   selectValues: (sql: FlexibleString, bind?: BindingSpec, asType?: SQLiteDataType) => Promise<SqlValue[]>
 }
 
-interface SQLiteWorker {
+export interface SQLiteWorker {
   version: Version
   getConfig: () => Promise<Config>
   open: (options: { filename?: string; flags?: string; vfs?: string }) => Promise<DB>
 }
 
-const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
+export const wrapWorker = (addDataMessageListener: (_: any)=>void, postMessage: (_: any) => void, versionParam: Version): SQLiteWorker => {
   const version = Object.freeze(versionParam)
   const asyncMap = new Map()
   let counter = 0
   const nextId = () => ++counter
 
-  const listener = (e: MessageEvent) => {
-    const { data } = e
+  const listener = (data) => {
     const { type, id } = data
 
     if (!id) throw new Error('Message has no id')
@@ -78,12 +77,12 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
       }
     }
   }
-  worker.addEventListener('message', listener)
+  addDataMessageListener(listener)
   const asyncCommand = <R> (params) : Promise<R> => {
     const id = nextId()
     return new Promise((resolve, reject) => {
       asyncMap.set(id, { resolve, reject })
-      worker.postMessage({ ...params, id })
+      postMessage({ ...params, id })
     })
   }
   const wrapDB = (openInfoParam: OpenInfo): Readonly<DB> => {
@@ -106,22 +105,6 @@ const wrapWorker = (worker: Worker, versionParam: Version): SQLiteWorker => {
   return Object.freeze({
     version,
     getConfig: () => asyncCommand<Config>({ type: 'getConfig' }),
-
     open: async paramObj => wrapDB(await asyncCommand<OpenInfo>({ type: 'open', ...paramObj })),
   })
 }
-
-export const initWorker = (workerScriptUrl: string | URL | undefined): Promise<SQLiteWorker> =>
-  new Promise((resolve, reject) => {
-    const url = workerScriptUrl === undefined ? new URL('./worker.js', import.meta.url) : workerScriptUrl
-    const worker: Worker = new Worker(url, { type: 'module' })
-
-    const initListener = ({ data }) => {
-      if (data.type !== 'ready')
-        reject(new Error('Expected first message to be ready message'))
-      worker.removeEventListener('message', initListener)
-      // console.log('worker ready SQLite version', data.version)
-      resolve(wrapWorker(worker, data.version as Version))
-    }
-    worker.addEventListener('message', initListener)
-  })
