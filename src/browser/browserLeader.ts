@@ -1,4 +1,4 @@
-import { wrapWorker, SQLiteWorker, Version } from '../leader.js'
+import { wrapWorker } from '../common/leader.js'
 
 export const initWorker = (): Promise<{dbWorker: SQLiteWorker, worker: Worker}> =>
   new Promise((resolve, reject) => {

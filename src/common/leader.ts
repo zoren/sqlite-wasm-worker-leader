@@ -1,4 +1,4 @@
-import type { FlexibleString, SqlValue, BindingSpec, SQLiteDataType } from '@sqlite.org/sqlite-wasm'
+import type { SqlValue } from '@sqlite.org/sqlite-wasm'
 
 class SQLiteError extends Error {
   eventData: any
@@ -6,43 +6,6 @@ class SQLiteError extends Error {
     super(message)
     this.eventData = eventData
   }
-}
-
-export interface Version {
-  libVersion: string
-  libVersionNumber: number
-  sourceId: string
-  downloadVersion: number
-}
-
-export interface Config {
-  version: Version
-  vfsList: string[]
-  opfsEnabled: boolean
-  bigIntEnabled: boolean
-}
-
-export interface OpenInfo {
-  filename: string
-  persistent: boolean
-  dbId: string
-  vfs: string
-}
-
-export interface DB {
-  openInfo: OpenInfo
-  close: () => Promise<void>
-  exec: (params: { sql: FlexibleString, rowMode?: 'array' | 'object' }) => Promise<null>
-  execArray: (params: { sql: FlexibleString }) => Promise<any[]>
-  execObject: (params: { sql: FlexibleString }) => Promise<any[]>
-  selectValue: (sql: FlexibleString, bind?: BindingSpec) => Promise<SqlValue | undefined>
-  selectValues: (sql: FlexibleString, bind?: BindingSpec, asType?: SQLiteDataType) => Promise<SqlValue[]>
-}
-
-export interface SQLiteWorker {
-  version: Version
-  getConfig: () => Promise<Config>
-  open: (options: { filename?: string; flags?: string; vfs?: string }) => Promise<DB>
 }
 
 export const wrapWorker = (addDataMessageListener: (_: any)=>void, postMessage: (_: any) => void, versionParam: Version): SQLiteWorker => {

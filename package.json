@@ -8,11 +8,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "main": "lib/leader.js",
-  "types": "lib/leader.d.ts",
+  "types": "index.d.ts",
   "exports": {
-    "./nodeLeader.js": "./lib/node/nodeLeader.js",
-    "./browserLeader.js": "./lib/browser/browserLeader.js"
+    ".": {
+      "node": "./lib/node/nodeLeader.js",
+      "browser": "./lib/browser/browserLeader.js"
+    }
   },
   "files": [
     "lib/"
@@ -20,7 +21,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prepublish": "tsc && cp src/worker.js lib/ && cp src/node/nodeWorker.js lib/node/ && cp src/browser/browserWorker.js lib/browser/",
+    "prepublish": "tsc && cp src/common/worker.js lib/common/ && cp src/node/nodeWorker.js lib/node/ && cp src/browser/browserWorker.js lib/browser/ && cp index.d.ts lib/",
     "clean": "rm -rf lib/ && rm -rf sqlite-wasm-worker-leader-*.tgz"
   },
   "dependencies": {

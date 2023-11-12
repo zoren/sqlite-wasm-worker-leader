@@ -1,5 +1,5 @@
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm'
-import { init } from '../worker.js'
+import { init } from '../common/worker.js'
 
 init(
 	await sqlite3InitModule(),
