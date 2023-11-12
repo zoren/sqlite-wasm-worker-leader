@@ -1,7 +1,7 @@
 import { Worker } from 'node:worker_threads'
 import { wrapWorker } from '../common/leader.js'
 
-export const initWorker = ()=>
+export const initWorker = () =>
   new Promise((resolve, reject) => {
     const worker = new Worker(new URL('./nodeWorker.js', import.meta.url))
     const initListener = (data) => {
