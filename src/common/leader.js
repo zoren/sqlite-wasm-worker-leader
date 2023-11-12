@@ -1,14 +1,4 @@
-import type { SqlValue } from '@sqlite.org/sqlite-wasm'
-
-class SQLiteError extends Error {
-  eventData: any
-  constructor(message: string, eventData: any) {
-    super(message)
-    this.eventData = eventData
-  }
-}
-
-export const wrapWorker = (addDataMessageListener: (_: any)=>void, postMessage: (_: any) => void, versionParam: Version): SQLiteWorker => {
+export const wrapWorker = (addDataMessageListener, postMessage, versionParam) => {
   const version = Object.freeze(versionParam)
   const asyncMap = new Map()
   let counter = 0
@@ -32,7 +22,7 @@ export const wrapWorker = (addDataMessageListener: (_: any)=>void, postMessage: 
       case 'error': {
         const { errorMessage } = data
         const { reject } = resolveRejectObj
-        reject(new SQLiteError(errorMessage, data))
+        reject(new Error(errorMessage))
         break
       }
       default: {
@@ -41,28 +31,28 @@ export const wrapWorker = (addDataMessageListener: (_: any)=>void, postMessage: 
     }
   }
   addDataMessageListener(listener)
-  const asyncCommand = <R> (params) : Promise<R> => {
+  const asyncCommand = (params)=> {
     const id = nextId()
     return new Promise((resolve, reject) => {
       asyncMap.set(id, { resolve, reject })
       postMessage({ ...params, id })
     })
   }
-  const wrapDB = (openInfoParam: OpenInfo): Readonly<DB> => {
+  const wrapDB = (openInfoParam) => {
     const openInfo = Object.freeze(openInfoParam)
     const { dbId } = openInfo
-    const asyncCommandDB = <R> (type, paramObj) =>
+    const asyncCommandDB = (type, paramObj) =>
       asyncCommand<R>({ type, dbId, ...paramObj })
     return Object.freeze({
       openInfo,
-      close: () => asyncCommandDB<void>('close', null),
+      close: () => asyncCommandDB('close', null),
       exec: async paramObj => {
         await asyncCommandDB('exec', { ...paramObj })
         return null},
-      execArray: paramObj => asyncCommandDB<any[][]>('exec', { rowMode: 'array', ...paramObj }),
-      execObject: paramObj => asyncCommandDB<any[]>('exec', { rowMode: 'object', ...paramObj }),
+      execArray: paramObj => asyncCommandDB('exec', { rowMode: 'array', ...paramObj }),
+      execObject: paramObj => asyncCommandDB('exec', { rowMode: 'object', ...paramObj }),
       selectValue: (sql, bind) => asyncCommandDB<SqlValue>('selectValue', { sql, bind }),
-      selectValues: (sql, bind, asType) => asyncCommandDB<SqlValue[]>('selectValues', { sql, bind, asType }),
+      selectValues: (sql, bind, asType) => asyncCommandDB('selectValues', { sql, bind, asType }),
     })
   }
   return Object.freeze({

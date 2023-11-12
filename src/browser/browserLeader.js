@@ -1,9 +1,9 @@
 import { wrapWorker } from '../common/leader.js'
 
-export const initWorker = (): Promise<{dbWorker: SQLiteWorker, worker: Worker}> =>
+export const initWorker = () =>
   new Promise((resolve, reject) => {
     const url = new URL('./browserWorker.js', import.meta.url)
-    const worker: Worker = new Worker(url, { type: 'module' })
+    const worker = new Worker(url, { type: 'module' })
 
     const initListener = ({ data }) => {
       if (data.type !== 'ready')
@@ -12,7 +12,7 @@ export const initWorker = (): Promise<{dbWorker: SQLiteWorker, worker: Worker}> 
       const dbWorker = wrapWorker(
         (l) => worker.addEventListener('message', (e) => l(e.data)),
         (d) => worker.postMessage(d),
-        data.version as Version)
+        data.version)
       resolve({ dbWorker, worker })
     }
     worker.addEventListener('message', initListener)
