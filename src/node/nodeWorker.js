@@ -1,5 +1,5 @@
 import { parentPort } from 'node:worker_threads'
-import sqlite3InitModuleNode from '../../node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3-node.mjs'
+import { sqlite3InitModuleNode } from '@sqlite.org/sqlite-wasm/node'
 import { init } from '../worker.js'
 
 init(
