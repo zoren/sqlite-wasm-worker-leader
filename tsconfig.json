@@ -12,6 +12,6 @@
     "outDir": "lib",
     "skipLibCheck": true,
   },
-  "include": ["src/", "index.d.ts"],
+  "include": ["src/", "src/index.d.ts"],
   "exclude": ["node_modules", "lib"]
 }

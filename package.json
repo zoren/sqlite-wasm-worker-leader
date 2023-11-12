@@ -21,7 +21,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prepublish": "tsc && cp src/common/worker.js lib/common/ && cp src/node/nodeWorker.js lib/node/ && cp src/browser/browserWorker.js lib/browser/ && cp index.d.ts lib/",
+    "prepublish": "cp -r src/ lib/",
     "clean": "rm -rf lib/ && rm -rf sqlite-wasm-worker-leader-*.tgz"
   },
   "dependencies": {
