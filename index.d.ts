@@ -71,4 +71,4 @@ interface Worker {
   terminate: () => void
 }
 
-declare function initWorker(): Promise<{ dbWorker: SQLiteWorker, worker: Worker }>
+export default function initWorker(): Promise<{ dbWorker: SQLiteWorker, worker: Worker }>
