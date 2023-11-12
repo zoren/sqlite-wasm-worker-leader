@@ -24,7 +24,7 @@
     "clean": "rm -rf lib/ && rm -rf sqlite-wasm-worker-leader-*.tgz"
   },
   "dependencies": {
-    "@sqlite.org/sqlite-wasm": "github:sqlite/sqlite-wasm#node"
+    "@sqlite.org/sqlite-wasm": "github:zoren/sqlite-wasm#node"
   },
   "devDependencies": {
     "@types/node": "^20.9.0",
