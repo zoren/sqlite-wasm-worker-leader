@@ -42,7 +42,7 @@ export const wrapWorker = (addDataMessageListener, postMessage, versionParam) =>
     const openInfo = Object.freeze(openInfoParam)
     const { dbId } = openInfo
     const asyncCommandDB = (type, paramObj) =>
-      asyncCommand<R>({ type, dbId, ...paramObj })
+      asyncCommand({ type, dbId, ...paramObj })
     return Object.freeze({
       openInfo,
       close: () => asyncCommandDB('close', null),
@@ -51,13 +51,13 @@ export const wrapWorker = (addDataMessageListener, postMessage, versionParam) =>
         return null},
       execArray: paramObj => asyncCommandDB('exec', { rowMode: 'array', ...paramObj }),
       execObject: paramObj => asyncCommandDB('exec', { rowMode: 'object', ...paramObj }),
-      selectValue: (sql, bind) => asyncCommandDB<SqlValue>('selectValue', { sql, bind }),
+      selectValue: (sql, bind) => asyncCommandDB('selectValue', { sql, bind }),
       selectValues: (sql, bind, asType) => asyncCommandDB('selectValues', { sql, bind, asType }),
     })
   }
   return Object.freeze({
     version,
-    getConfig: () => asyncCommand<Config>({ type: 'getConfig' }),
-    open: async paramObj => wrapDB(await asyncCommand<OpenInfo>({ type: 'open', ...paramObj })),
+    getConfig: () => asyncCommand({ type: 'getConfig' }),
+    open: async paramObj => wrapDB(await asyncCommand({ type: 'open', ...paramObj })),
   })
 }
